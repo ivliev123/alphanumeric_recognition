@@ -18,7 +18,7 @@ gray = cv2.medianBlur(gray,3)
 #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 7))
 #closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
 
-#cv2.imwrite("kernel.jpg", thresh)
+
 #closed = cv2.erode(closed, None, iterations = 4)
 #closed = cv2.dilate(closed, None, iterations = 4)
 
@@ -28,10 +28,20 @@ th2 = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,\
 th3 = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
             cv2.THRESH_BINARY_INV,11,7)
 #edge = cv2.Canny (gray, 200,200,11)
-
 #cv2.imwrite("Canny.jpg", edge)
+
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (12, 12))
+closed = cv2.morphologyEx(th3, cv2.MORPH_CLOSE, kernel)
+
+
+closed = cv2.erode(closed, None, iterations = 4)
+closed = cv2.dilate(closed, None, iterations = 4)
+cv2.imwrite("сlosed.jpg", closed)
+
 cv2.imwrite("th2.jpg", th2)
 cv2.imwrite("th3.jpg", th3)
+
+im_big, cnts_big, hierarchy_big  = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
 im2, cnts, hierarchy  = cv2.findContours(th3, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -43,8 +53,21 @@ im2, cnts, hierarchy  = cv2.findContours(th3, cv2.RETR_EXTERNAL, cv2.CHAIN_APPRO
 
 b=0
 
+for array_big in cnts_big:
+	if b<4:
+		c = sorted(cnts_big, key = cv2.contourArea, reverse = True)[b]
+		x1,y1,w1,h1 = cv2.boundingRect(c)
+		cv2.rectangle(image,(x1,y1),(x1+w1,y1+h1),(0,0,255),2)
+	b = b+ 1
+
+b=0
 for array in cnts:
+	#if b<10:
+		#c = sorted(cnts, key = cv2.contourArea, reverse = True)[b]
+		#x1,y1,w1,h1 = cv2.boundingRect(c)
+		#cv2.rectangle(image,(x1,y1),(x1+w1,y1+h1),(0,0,255),2)
 	
+
 	cnt = cnts[b]
 	x,y,w,h = cv2.boundingRect(cnt)
 	cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),2)
