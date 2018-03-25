@@ -46,9 +46,9 @@ b=0
 for array in cnts:
 	
 	cnt = cnts[b]
- 	x,y,w,h = cv2.boundingRect(cnt)
-    	cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
-	cv2.drawContours(image, [cnt], 0, (0,255,0), 3)
+	x,y,w,h = cv2.boundingRect(cnt)
+	cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),2)
+	#cv2.drawContours(image, [cnt], 0, (0,255,0), 3)
 	b = b+ 1
 print(b)
 #cnt = cnts[1]
