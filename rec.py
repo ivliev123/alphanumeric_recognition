@@ -3,6 +3,8 @@ import argparse
 import cv2
 import base
 
+base_digite_s_letter=base.base_digite_s_letter
+
 def index_min(array, n): #массив и номер столбца
     array_new=[]
     for i in range(len(array)):
@@ -14,6 +16,8 @@ def index_min(array, n): #массив и номер столбца
 #image = cv2.imread('barcode_01.jpg')
 image = cv2.imread('test2.jpg')
 
+im_from_b = np.zeros((20, 20))
+
 
 final_wide = 600
 r = float(final_wide) / image.shape[1]
@@ -24,30 +28,12 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 gray = cv2.medianBlur(gray,3)
 
 
-#gradX = cv2.Sobel(gray, cv2.CV_64F,1,0,ksize=-1)
-#gradY = cv2.Sobel(gray, cv2.CV_64F,0,1,ksize=-1)
-#gradient = cv2.subtract(gradX, gradY)
-#gradient = cv2.convertScaleAbs(gradient)
-
-#blurred = cv2.blur(gradient, (9, 9))
-#(_,thresh) = cv2.threshold(blurred, 225, 255, cv2.THRESH_BINARY)
-#kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 7))
-#closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-
-
-#closed = cv2.erode(closed, None, iterations = 4)
-#closed = cv2.dilate(closed, None, iterations = 4)
 
 
 th3 = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,\
             cv2.THRESH_BINARY_INV,11,7)
 th2 = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
             cv2.THRESH_BINARY_INV,11,7)
-#edge = cv2.Canny (gray, 200,200,11)
-#cv2.imwrite("Canny.jpg", edge)
-
-#th3 = cv2.erode(th3, None, iterations = 1)
-#th3 = cv2.dilate(th3, None, iterations = 2)
 
 
 
@@ -106,8 +92,34 @@ for array_big in cnts_big:
 			if w_info>0.2*h_info and w_info<0.9*h_info and w_info>4 and h_info>4:
 				im_digit_letter = th3_info[y_info:y_info+h_info, x_info:x_info+w_info]   # переменная (фото которое нужно распознавать
 				im_digit_letter_res=cv2.resize(im_digit_letter,(20,20))
+				im_digit_letter_res_ar=np.array(im_digit_letter_res)
+				cv2.imwrite("testtest.jpg",im_digit_letter_res)
+
 				# тут в будущем будет функция для прогонк через нейронку
 				
+				for l in range(len(base_digite_s_letter)):
+					
+					im_from_base=cv2.imread(base_digite_s_letter[l][1])
+					
+					
+					im_from_base = cv2.cvtColor(im_from_base, cv2.COLOR_BGR2GRAY)
+					im_from_base_ar=np.array(im_from_base)
+					#cv2.imwrite("testtest.jpg",im_from_base)
+					razn=0
+					for y in range(20):
+						for x in range(20):
+							pixl1 = im_digit_letter_res_ar[y][x]
+							pixl2 = im_from_base_ar[y][x]
+							razn= razn + abs(pixl1 - pixl2)
+							
+					print(razn)		
+					base_digite_s_letter[l][2]=razn
+					#print(razn)
+				#print(base_digite_s_letter)
+				minimym, index = index_min(base_digite_s_letter,3)
+				font = cv2.FONT_HERSHEY_SIMPLEX
+				cv2.putText(get_im_ar,base_digite_s_letter[index][0],(x_info,y_info), font, 1,(255,0,0),1,cv2.LINE_AA)
+
 
 				cv2.rectangle(get_im_ar,(x_info,y_info),(x_info+w_info,y_info+h_info),(255,255,255),2)
 				cv2.imwrite("info/"+str(b) +".jpg", get_im_ar)

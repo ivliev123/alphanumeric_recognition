@@ -18,3 +18,4 @@ base_digite_s_letter=[["v","base/v.0.jpg",0],
 			
 				
 			]
+#print (base_digite_s_letter[0][1])
