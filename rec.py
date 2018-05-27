@@ -75,6 +75,28 @@ for array_big in cnts_big:
 			get_h1=get_h1+get_y1 
 			get_y1=0
 		get_im_ar = image[get_y1:get_y1+get_h1, get_x1:get_x1+get_w1]
+
+		rect = cv2.minAreaRect(c)
+		box = cv2.boxPoints(rect)
+		box = np.int0(box)
+		cv2.drawContours(image,[box],0,(255,0,255),2)
+
+		coords = np.column_stack(np.where(th3 > 0))
+		#angle = cv2.minAreaRect(coords)[-1]
+		angle = cv2.minAreaRect(c)[-1]
+		if angle < -45:
+			angle = (90 + angle)
+
+		else:
+			angle = -angle
+		print('angle',angle)
+
+		(h, w) = closed.shape[:2]
+		center = (w // 2, h // 2)
+		M = cv2.getRotationMatrix2D(center, angle, 1.0)
+		rotated = cv2.warpAffine(image, M, (w, h),flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+		cv2.imwrite("info.jpg", rotated)
+
 		cv2.imwrite("info/"+str(b) +".jpg", get_im_ar)
 		
 		gray_info = cv2.cvtColor(get_im_ar, cv2.COLOR_BGR2GRAY)
