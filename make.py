@@ -4,7 +4,7 @@ import cv2
 
 
 #image = cv2.imread('barcode_01.jpg')
-image = cv2.imread('baseno/k.jpg')
+image = cv2.imread('baseno/5.jpg')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 ret,th1 = cv2.threshold(gray,127,255,cv2.THRESH_BINARY_INV)
@@ -24,5 +24,5 @@ for array in cnts:
 	x,y,w,h = cv2.boundingRect(cnt)
 	get= th1[y:y+h, x:x+w]
 	get_resize=cv2.resize(get, (20,20))
-	cv2.imwrite("base/"+"k."+str(b)+".jpg", get_resize)
+	cv2.imwrite("base/"+"5."+str(b)+".jpg", get_resize)
 	b=b+1
