@@ -23,10 +23,10 @@ final_wide = 600
 r = float(final_wide) / image.shape[1]
 dim = (final_wide, int(image.shape[0] * r))
 image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
- 
+
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 gray = cv2.medianBlur(gray,3)
-
+cv2.imwrite("gray.png",gray)
 
 
 
@@ -70,9 +70,9 @@ for array_big in cnts_big:
 		if get_x1<0:
 			get_w1=get_w1+get_x1
 			get_x1=0
-			
+
 		if get_y1<0:
-			get_h1=get_h1+get_y1 
+			get_h1=get_h1+get_y1
 			get_y1=0
 		get_im_ar = image[get_y1:get_y1+get_h1, get_x1:get_x1+get_w1]
 
@@ -98,7 +98,7 @@ for array_big in cnts_big:
 		cv2.imwrite("info.jpg", rotated)
 
 		cv2.imwrite("info/"+str(b) +".jpg", get_im_ar)
-		
+
 		gray_info = cv2.cvtColor(get_im_ar, cv2.COLOR_BGR2GRAY)
 		#gray_info = cv2.medianBlur(gray_info,3)
 		gray_info = cv2.bilateralFilter(gray_info,7,5,5)
@@ -108,7 +108,7 @@ for array_big in cnts_big:
 		im_info, cnts_info, hierarchy_info  = cv2.findContours(th3_info, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 		k=0
 		for array_info in cnts_info:
-			
+
 			cnt_info = cnts_info[k]
 			x_info,y_info,w_info,h_info = cv2.boundingRect(cnt_info)
 			if w_info>0.2*h_info and w_info<0.9*h_info and w_info>4 and h_info>4:
@@ -118,12 +118,12 @@ for array_big in cnts_big:
 				cv2.imwrite("testtest.jpg",im_digit_letter_res)
 
 				# тут в будущем будет функция для прогонк через нейронку
-				
+
 				for l in range(len(base_digite_s_letter)):
-					
+
 					im_from_base=cv2.imread(base_digite_s_letter[l][1])
-					
-					
+
+
 					im_from_base = cv2.cvtColor(im_from_base, cv2.COLOR_BGR2GRAY)
 					im_from_base_ar=np.array(im_from_base)
 					#cv2.imwrite("testtest.jpg",im_from_base)
@@ -133,8 +133,8 @@ for array_big in cnts_big:
 							pixl1 = im_digit_letter_res_ar[y][x]
 							pixl2 = im_from_base_ar[y][x]
 							razn= razn + abs(pixl1 - pixl2)
-							
-					print(razn)		
+
+					print(razn)
 					base_digite_s_letter[l][2]=razn
 					#print(razn)
 				#print(base_digite_s_letter)
@@ -163,7 +163,7 @@ b=0
 		#c = sorted(cnts, key = cv2.contourArea, reverse = True)[b]
 		#x1,y1,w1,h1 = cv2.boundingRect(c)
 		#cv2.rectangle(image,(x1,y1),(x1+w1,y1+h1),(0,0,255),2)
-	
+
 
 	#cnt = cnts[b]
 	#x,y,w,h = cv2.boundingRect(cnt)
