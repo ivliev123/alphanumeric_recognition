@@ -7,7 +7,7 @@ from PIL import Image
 import pytesseract
 
 base_digite_s_letter=base.base_digite_s_letter
-
+all_array_text=[]
 
 
 
@@ -100,13 +100,14 @@ for i in range(3):
 
 	else:
 		angle = -angle
-	print('angle',angle)
+	#print('angle',angle)
 
 	(h, w) = closed.shape[:2]
 	center = (w // 2, h // 2)
 	M = cv2.getRotationMatrix2D(center, angle, 1.0)
 	rotated = cv2.warpAffine(image2, M, (w, h),flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 	#cv2.imwrite("info"+str(i)+".jpg", rotated)
+print('angle',angle)
 ####################################################обработка баркодов
 
 
@@ -134,7 +135,7 @@ im_big, cnts_big, hierarchy_big  = cv2.findContours(closed1, cv2.RETR_EXTERNAL, 
 
 b=0
 for array_big in cnts_big:
-	if b<4:
+	if b<2:
 		c = sorted(cnts_big, key = cv2.contourArea, reverse = True)[b]
 		x1,y1,w1,h1 = cv2.boundingRect(c)
 		#cv2.rectangle(rotated,(x1,y1),(x1+w1,y1+h1),(0,0,255),2)
@@ -198,16 +199,17 @@ for array_big in cnts_big:
 						for x in range(20):
 							pixl1 = im_digit_letter_res_ar[y][x]
 							pixl2 = im_from_base_ar[y][x]
-							razn= razn + abs(pixl1 - pixl2)
+							razn= razn + abs(int(pixl1) - (pixl2))
 
-					print(razn)
+					#print(razn)
 					base_digite_s_letter[l][2]=razn
 					#print(razn)
 				#print(base_digite_s_letter)
 				minimym, index = index_min(base_digite_s_letter,2)
 				font = cv2.FONT_HERSHEY_PLAIN
-
-
+				array_text = [base_digite_s_letter[index][0],x_info,y_info,"None"]
+                # last element- delta y (for find all digits and letter on one leval)
+				all_array_text.append(array_text)
 
 				cv2.rectangle(get_im_ar,(x_info,y_info),(x_info+w_info,y_info+h_info),(255,255,255,0.1),2)
 				cv2.imwrite("info/"+str(b) +".jpg", get_im_ar)
@@ -238,6 +240,40 @@ for array_big in cnts_big:
 	b = b+ 1
 
 b=0
+array_for_finish=[]
+n_str=0
+metka=True
+#формирование строки
+all_array_text.sort(key=lambda i: i[2])
+
+for dl1 in range(len(all_array_text)):
+	#print(all_array_text[dl1][0])
+	if metka==True:
+		array_for_finish.append([])
+
+	array_for_finish[n_str].append([all_array_text[dl1][0],all_array_text[dl1][1]])
+	if dl1==len(all_array_text)-1:
+		delta_y = abs(all_array_text[dl1][2] - all_array_text[dl1-1][2])
+	else:
+		delta_y = abs(all_array_text[dl1][2] - all_array_text[dl1+1][2])
+	if delta_y > 5:
+		#print()
+		metka=True
+		n_str+=1
+	else:
+		metka=False
+
+#print(array_for_finish)
+
+stroka=""
+#првильное размещение символов в строке
+for d in range(len(array_for_finish)):
+	array_for_finish[d].sort(key=lambda i: i[1])
+	stroka=""
+	for l in range(len(array_for_finish[d])):
+		stroka=stroka+array_for_finish[d][l][0]
+	print()
+	print(stroka)
 
 cv2.imwrite("Image.jpg", clone)
 cv2.waitKey(0)
