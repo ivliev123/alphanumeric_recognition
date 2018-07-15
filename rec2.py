@@ -3,8 +3,7 @@ import argparse
 import cv2
 import base
 import imutils
-from PIL import Image
-import pytesseract
+
 
 base_digite_s_letter=base.base_digite_s_letter
 all_array_text=[]
@@ -77,7 +76,7 @@ cnts = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL,
 cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
 
-for i in range(3):
+for i in range(1):
 	c = sorted(cnts, key = cv2.contourArea, reverse = True)[i]
 
 	# compute the rotated bounding box of the largest contour
@@ -212,8 +211,10 @@ for array_big in cnts_big:
 				all_array_text.append(array_text)
 
 				cv2.rectangle(get_im_ar,(x_info,y_info),(x_info+w_info,y_info+h_info),(255,255,255,0.1),2)
-				cv2.imwrite("info/"+str(b) +".jpg", get_im_ar)
+
 				cv2.putText(get_im_ar,base_digite_s_letter[index][0],(x_info,y_info), font, 1,(255,0,0,),1,cv2.LINE_AA)
+				cv2.imwrite("info/"+str(b) +".jpg", get_im_ar)
+
 			k=k+1
 		if len(all_digit_letter)>0:
 			minimymx, indexminx = index_min(all_digit_letter,0)
