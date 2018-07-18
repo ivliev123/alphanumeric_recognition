@@ -28,7 +28,10 @@ base_digite_s_letter=[["v","base/v.0.jpg",0],
 			["5","base/5.4.jpg",0],
 			["5","base/5.5.jpg",0],
 
+			["1","base/1.1.jpg",0],	
 			
+			["4","base/4.1.jpg",0],	
+	
 	
 			["6","base/6.0.jpg",0],
 
@@ -38,6 +41,12 @@ base_digite_s_letter=[["v","base/v.0.jpg",0],
 
 			["2","base/2.1.jpg",0],
 			["2","base/2.2.jpg",0],	
+			["2","base/2.3.jpg",0],	
+			
+			["7","base/7.1.jpg",0],	
+			
+			["9","base/9.1.jpg",0],	
+			["9","base/9.2.jpg",0],	
 		
 			
 

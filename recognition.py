@@ -50,7 +50,9 @@ gradY = cv2.Sobel(gray, ddepth=ddepth, dx=0, dy=1, ksize=-1)
 
 # subtract the y-gradient from the x-gradient
 gradient = cv2.subtract(gradX, gradY)
+cv2.imwrite("gradient.png",gradient)
 gradient = cv2.convertScaleAbs(gradient)
+cv2.imwrite("gradient2.png",gradient)
 
 # blur and threshold the image
 blurred = cv2.blur(gradient, (9, 9))
@@ -109,6 +111,53 @@ for i in range(1):
 print('angle',angle)
 ####################################################обработка баркодов
 
+##################################################################################################################
+image = rotated
+if image.shape[1] > 600:
+    image = imutils.resize(image, width=600)
+
+image2=image.copy()
+clone = image.copy()
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#cv2.imwrite("b_gray.png",gray)
+#cv2.imwrite("a_Image.png", image)
+
+# compute the Scharr gradient magnitude representation of the images
+# in both the x and y direction using OpenCV 2.4
+ddepth = cv2.cv.CV_32F if imutils.is_cv2() else cv2.CV_32F
+gradX = cv2.Sobel(gray, ddepth=ddepth, dx=1, dy=0, ksize=-1)
+gradY = cv2.Sobel(gray, ddepth=ddepth, dx=0, dy=1, ksize=-1)
+#cv2.imwrite("c_gradX.png",gradX)
+#cv2.imwrite("d_gradY.png",gradY)
+
+# subtract the y-gradient from the x-gradient
+gradient = cv2.subtract(gradX, gradY)
+cv2.imwrite("gradient.png",gradient)
+gradient = cv2.convertScaleAbs(gradient)
+cv2.imwrite("gradient2.png",gradient)
+
+# blur and threshold the image
+blurred = cv2.blur(gradient, (9, 9))
+#cv2.imwrite("e_blurred.png",blurred)
+(_, thresh) = cv2.threshold(blurred, 225, 255, cv2.THRESH_BINARY)
+#cv2.imwrite("f_thresh.png",thresh)
+
+# construct a closing kernel and apply it to the thresholded image
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 7))
+closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+#cv2.imwrite("g_closed.png",closed)
+
+# perform a series of erosions and dilations
+closed = cv2.erode(closed, None, iterations = 4)
+#cv2.imwrite("h_closed1.png",closed)
+closed = cv2.dilate(closed, None, iterations = 4)
+#cv2.imwrite("l_closed2.png",closed)
+
+# find the contours in the thresholded image, then sort the contours
+# by their area, keeping only the largest one
+cnts = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL,
+	cv2.CHAIN_APPROX_SIMPLE)
+cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
 
 ##########обработка перевернутого изображения
@@ -128,28 +177,37 @@ closed1 = cv2.erode(closed1, None, iterations = 4)
 closed1 = cv2.dilate(closed1, None, iterations = 4)
 #cv2.imwrite("сlosed1.jpg", closed)
 
-im_big, cnts_big, hierarchy_big  = cv2.findContours(closed1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+im_big, cnts_big, hierarchy_big  = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
 
 
 b=0
 for array_big in cnts_big:
-	if b<2:
+	if b<3:
 		c = sorted(cnts_big, key = cv2.contourArea, reverse = True)[b]
 		x1,y1,w1,h1 = cv2.boundingRect(c)
 		#cv2.rectangle(rotated,(x1,y1),(x1+w1,y1+h1),(0,0,255),2)
-		get_x1=x1
-		get_y1=y1-h1
-		get_h1=int(1.3*h1)
-		get_w1=w1
-		if get_x1<0:
-			get_w1=get_w1+get_x1
-			get_x1=0
+		vn="n"
+		if vn=="v":
+			get_x1=x1
+			get_y1=y1-h1
+			get_h1=int(1*h1)
+			get_w1=w1
+			if get_x1<0:
+				get_w1=get_w1+get_x1
+				get_x1=0
 
-		if get_y1<0:
-			get_h1=get_h1+get_y1
-			get_y1=0
-		get_im_ar = rotated[get_y1:get_y1+get_h1, get_x1:get_x1+get_w1]
+			if get_y1<0:
+				get_h1=get_h1+get_y1
+				get_y1=0
+			get_im_ar = rotated[get_y1:get_y1+get_h1, get_x1:get_x1+get_w1]
+		if vn=="n":
+			get_x2=x1-5
+			get_h2=int(1.9*h1)
+			get_y2=y1+h1-int(0.8*h1)
+			get_w2=w1
+
+			get_im_ar = rotated[get_y2:get_y2+get_h2, get_x2:get_x2+get_w2]
 
 
 
@@ -212,7 +270,7 @@ for array_big in cnts_big:
 
 				cv2.rectangle(get_im_ar,(x_info,y_info),(x_info+w_info,y_info+h_info),(255,255,255,0.1),2)
 
-				cv2.putText(get_im_ar,base_digite_s_letter[index][0],(x_info,y_info), font, 1,(255,0,0,),1,cv2.LINE_AA)
+				cv2.putText(get_im_ar,base_digite_s_letter[index][0],(x_info,y_info), font, 1,(0,0,255,),1,cv2.LINE_AA)
 				cv2.imwrite("info/"+str(b) +".jpg", get_im_ar)
 
 			k=k+1
@@ -231,12 +289,17 @@ for array_big in cnts_big:
 			#print(text)
 			cv2.imwrite("info/image_for_tesseract"+str(b)+".png",image_for_tesseract)
 		#get_x2=x1
-		#get_h2=int(1.3*h1)
-		#get_y2=y1+h1-int(0.3*h1)
+		#get_h2=int(1*h1)
+		#get_y2=y1+h1-int(0.55*h1)
 		#get_w2=w1
 
-		#get_im_ar = image[get_y2:get_y2+get_h2, get_x2:get_x2+get_w2]
+		#get_im_ar = rotated[get_y2:get_y2+get_h2, get_x2:get_x2+get_w2]
 		#cv2.imwrite("info/"+str(b) +".002.jpg", get_im_ar)
+
+
+
+
+
 
 	b = b+ 1
 
